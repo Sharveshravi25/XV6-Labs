@@ -199,6 +199,11 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
+	$U/_pingpong\
+	$U/_sleep\
+	$U/_find\
+	$U/_primes\
+	$U/_xargs\
 
 
 
@@ -290,7 +295,7 @@ ifndef CPUS
 CPUS := 1
 endif
 ifeq ($(LAB),fs)
-CPUS := 2
+CPUS := 1
 endif
 
 FWDPORT = $(shell expr `id -u` % 5000 + 25999)
