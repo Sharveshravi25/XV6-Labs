@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -94,4 +95,34 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64 sys_sysinfo(void){
+
+  uint64 sysinfo_addr;
+  struct sysinfo info_struct;
+
+  if(argaddr(0,&sysinfo_addr)<0){
+    printf("failed to fetch addr\n");
+    exit(-1);
+  };
+  uint64 freemem=count_free_mem();
+  uint64 nproc=count_nproc();
+  info_struct.freemem=freemem;
+  info_struct.nproc=nproc;
+
+  if(copyout(myproc()->pagetable,sysinfo_addr,(char*)&info_struct,sizeof(info_struct))<0) return -1;
+  return 0;
+}
+
+
+uint64 sys_trace(void){ // this func, gets trace mask_num and adds to myproc()
+    int mask_num;
+    if(argint(0,&mask_num)<0){
+      printf("failed to fetch mask\n");
+      return -1;
+    }   
+    struct proc*p=myproc();
+    p->mask_num=mask_num;
+    return 0;
 }

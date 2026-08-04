@@ -90,7 +90,8 @@ testcall() {
   }
 }
 
-void testproc() {
+void
+ testproc() {
   struct sysinfo info;
   uint64 nproc;
   int status;
