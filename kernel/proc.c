@@ -126,7 +126,17 @@ found:
     release(&p->lock);
     return 0;
   }
-
+  //Allocating backup trapframe
+  if((p->sub_frame = (struct trapframe *)kalloc()) == 0){
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+  
+  p->alarm_interval=0;
+  p->alarm_ticks=0;
+  p->handler_ptr=0;
+  p->alarm_run_flag=0;
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -153,6 +163,9 @@ freeproc(struct proc *p)
   if(p->trapframe)
     kfree((void*)p->trapframe);
   p->trapframe = 0;
+  if(p->sub_frame)
+    kfree((void*)p->sub_frame);
+  p->sub_frame=0;
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
   p->pagetable = 0;
@@ -163,6 +176,10 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
+  p->alarm_interval=0;
+  p->alarm_ticks=0;
+  p->handler_ptr=0;
+  p->alarm_run_flag=0;
   p->state = UNUSED;
 }
 
@@ -303,6 +320,18 @@ fork(void)
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
+  //for child to initialise alarm tick states
+  np->alarm_interval = p->alarm_interval;
+  np->handler_ptr = p->handler_ptr;
+  np->alarm_ticks = 0;
+  np->alarm_run_flag = p->alarm_run_flag;  
+  
+  if (np->sub_frame) {   
+    memmove(np->sub_frame, np->trapframe, sizeof(struct trapframe));
+  }
+
+
+  
   pid = np->pid;
 
   release(&np->lock);

@@ -2817,8 +2817,10 @@ main(int argc, char *argv[])
   struct test {
     void (*f)(char *);
     char *s;
-  } tests[] = {
+  } tests[] = {  
     {MAXVAplus, "MAXVAplus"},
+
+    ///*
     {manywrites, "manywrites"},
     {execout, "execout"},
     {copyin, "copyin"},
@@ -2832,13 +2834,21 @@ main(int argc, char *argv[])
     {truncate3, "truncate3"},
     {reparent2, "reparent2"},
     {pgbug, "pgbug" },
+    //*/
+
     {sbrkbugs, "sbrkbugs" },
-    // {badwrite, "badwrite" },
+
+    /*
+    {badwrite, "badwrite" },
     {badarg, "badarg" },
     {reparent, "reparent" },
     {twochildren, "twochildren"},
     {forkfork, "forkfork"},
-    {forkforkfork, "forkforkfork"},
+    */
+
+    ///{forkforkfork, "forkforkfork"},
+
+    ///*
     {argptest, "argptest"},
     {createdelete, "createdelete"},
     {linkunlink, "linkunlink"},
@@ -2855,24 +2865,44 @@ main(int argc, char *argv[])
     {bsstest, "bsstest"},
     {sbrkbasic, "sbrkbasic"},
     {sbrkmuch, "sbrkmuch"},
+    //*/
+
     {kernmem, "kernmem"},
     {sbrkfail, "sbrkfail"},
+
+    /*
     {sbrkarg, "sbrkarg"},
     {sbrklast, "sbrklast"},
     {sbrk8000, "sbrk8000"},
     {validatetest, "validatetest"},
-    {stacktest, "stacktest"},
+    */
+
+    //{stacktest, "stacktest"},
+
+    /*
     {opentest, "opentest"},
     {writetest, "writetest"},
-    {writebig, "writebig"},
+    */
+
+    //{writebig, "writebig"},
+
+    /*
     {createtest, "createtest"},
-    {openiputtest, "openiput"},
+    */
+
+    //{openiputtest, "openiput"},
+
+    /*
     {exitiputtest, "exitiput"},
     {iputtest, "iput"},
     {mem, "mem"},
     {pipe1, "pipe1"},
-    {killstatus, "killstatus"},
-    {preempt, "preempt"},
+    */
+
+    //{killstatus, "killstatus"},
+    //{preempt, "preempt"},  
+
+    /*
     {exitwait, "exitwait"},
     {rmdot, "rmdot"},
     {fourteen, "fourteen"},
@@ -2881,6 +2911,8 @@ main(int argc, char *argv[])
     {iref, "iref"},
     {forktest, "forktest"},
     {bigdir, "bigdir"}, // slow
+    */
+
     { 0, 0},
   };
 

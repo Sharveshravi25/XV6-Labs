@@ -37,6 +37,7 @@ periodic()
   sigreturn();
 }
 
+
 // tests whether the kernel calls
 // the alarm handler even a single time.
 void
@@ -64,7 +65,7 @@ void __attribute__ ((noinline)) foo(int i, int *j) {
   if((i % 2500000) == 0) {
     write(2, ".", 1);
   }
-  *j += 1;
+  *j += 1;  
 }
 
 //

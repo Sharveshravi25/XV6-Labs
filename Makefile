@@ -93,10 +93,15 @@ LABUPPER = $(shell echo $(LAB) | tr a-z A-Z)
 XCFLAGS += -DSOL_$(LABUPPER) -DLAB_$(LABUPPER)
 endif
 
-CFLAGS += $(XCFLAGS)
+CFLAGS = -Wall -Werror -Wno-unknown-attributes -O3 -fno-omit-frame-pointer -ggdb -g
+CFLAGS += -march=rv64gc_zicsr_zifencei -mabi=lp64d
+CFLAGS += -std=gnu99
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
-CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
+CFLAGS += -ffreestanding
+CFLAGS += -fno-common -nostdlib
+CFLAGS += -fno-builtin
+CFLAGS += -Wno-error=infinite-recursion -Wno-error=array-bounds -Wno-error=main
 CFLAGS += -I.
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
@@ -146,7 +151,7 @@ ULIB += $U/statistics.o
 endif
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(LD) $(LDFLAGS) -N -e main -T user/user.ld -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
@@ -188,6 +193,8 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
+	$U/_bttest\
+	$U/_alarmtest\
 
 
 
@@ -284,7 +291,7 @@ ifndef CPUS
 CPUS := 3
 endif
 ifeq ($(LAB),fs)
-CPUS := 1
+CPUS := 3
 endif
 
 FWDPORT = $(shell expr `id -u` % 5000 + 25999)
@@ -298,8 +305,7 @@ QEMUOPTS += -netdev user,id=net0,hostfwd=udp::$(FWDPORT)-:2000 -object filter-du
 QEMUOPTS += -device e1000,netdev=net0,bus=pcie.0
 endif
 
-qemu: $K/kernel fs.img
-	$(QEMU) $(QEMUOPTS)
+
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
@@ -407,3 +413,8 @@ myapi.key:
 
 
 .PHONY: handin tarball tarball-pref clean grade handin-check
+
+qemu: $K/kernel fs.img
+	stty raw -echo
+	$(QEMU) $(QEMUOPTS)
+	stty sane

@@ -1,0 +1,13 @@
+Q1: Registers a0 through a7 contain arguments to functions. 
+The value 13 is held in register a2 in main's call to printf.
+Q2: There are no explicit calls to function f or g in the assembly code for main. 
+The compiler optimized the code by inlining both functions, calculating the final constant result at 
+compile-time.
+Q3: 0000000000000d02
+Q4: 34
+Q5: The output is "He110 World". On a big-endian machine, you would set i to 0x726c6400 to get the same output.
+ You do not need to change 57616 because register values are numeric constants independent of memory 
+ byte-ordering.
+Q6: A random garbage value is printed after 'y='. This happens because the format string expects two arguments
+ (mapping to a1 and a2), but only one argument is provided (3, which maps to a1). The printf function still
+  reads register a2, printing whatever random bits are currently left inside it.
