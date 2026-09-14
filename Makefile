@@ -93,6 +93,7 @@ endif
 
 CFLAGS += $(XCFLAGS)
 CFLAGS += -MD
+CFLAGS += -Wno-infinite-recursion
 CFLAGS += -mcmodel=medany
 CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
 CFLAGS += -I.
@@ -278,9 +279,6 @@ QEMUOPTS += -netdev user,id=net0,hostfwd=udp::$(FWDPORT)-:2000 -object filter-du
 QEMUOPTS += -device e1000,netdev=net0,bus=pcie.0
 endif
 
-qemu: $K/kernel fs.img
-	$(QEMU) $(QEMUOPTS)
-
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
 
@@ -387,3 +385,8 @@ myapi.key:
 
 
 .PHONY: handin tarball tarball-pref clean grade handin-check
+
+qemu: $K/kernel fs.img
+	stty raw -echo
+	$(QEMU) $(QEMUOPTS)
+	stty sane
