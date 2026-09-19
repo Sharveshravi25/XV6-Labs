@@ -1,0 +1,14 @@
+1. Explain the output of vmprint in terms of Fig 3-4 from the text.
+The output shows a 3-level page table hierarchy (L2 -> L1 -> L0). The root page table is at L2. Index 0 points to an L1 page table, which in turn points to an L0 page table containing the process's text (code), data, and stack segments. Index 255 maps the highest virtual memory addresses, which contain the global Trampoline page and the process's internal Trapframe page.
+
+2. What does page 0 contain?
+Page 0 contains the user program text (instructions/code) and data segments loaded from the binary executable (init).
+
+3. What is in page 2?
+Page 2 contains the user execution stack page, which is protected by a guard page right below it at page 1.
+
+4. When running in user mode, could the process read/write the memory mapped by page 1?
+No. Page 1 is configured as a protective guard page to catch stack overflows. Its valid bit (PTE_V) is set to 0 (or lacks PTE_U/PTE_R/PTE_W permission flags), meaning any user-mode read or write attempt will instantly trigger a page fault trap to protect the system.
+
+5. What does the third to last page contain?
+The third to last page (index 509 under index 511) contains the custom USYSCALL shared memory page that we mapped in the first part of the lab to optimize the getpid system call.

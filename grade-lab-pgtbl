@@ -46,17 +46,13 @@ def test_answers():
     # just a simple sanity check, will be graded manually
     check_answers("answers-pgtbl.txt")
 
-@test(5, "count copyin")
-def test_count():
+@test(20, "pgaccess")
+def test_pgaccess():
     r.run_qemu(shell_script([
-        'stats', 'stats'
-    ]), timeout=150)
-    matches = re.findall(r'^copyin: (\d+)', r.qemu.output, re.MULTILINE)
-    assert_equal(len(matches), 2)
-    assert_equal(int(matches[1]), int(matches[0]) + 28)
-    matches = re.findall(r'^copyinstr: (\d+)', r.qemu.output, re.MULTILINE)
-    assert_equal(len(matches), 2)
-    assert_equal(int(matches[1]), int(matches[0]) + 3)
+        'pgtbltest'
+    ]))
+    r.match('^pgaccess_test_char starting$')
+    r.match('^pgaccess_test_char: OK$')
 
 @test(0, "usertests")
 def test_usertests():

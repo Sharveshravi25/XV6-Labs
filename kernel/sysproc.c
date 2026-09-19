@@ -95,3 +95,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_pgaccess(void){
+   uint64 va;
+   int npages;
+   uint64 dest;
+   if((argaddr(0,&va) <0) || (argint(1,&npages)<0) || (argaddr(2,&dest)<0)) return -1;
+   va=PGROUNDDOWN(va);
+   struct proc*p=myproc();
+   pagetable_t pgtbl=p->pagetable;
+   return pgaccess(pgtbl,va,npages,dest); 
+}

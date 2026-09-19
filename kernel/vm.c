@@ -440,3 +440,54 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+
+void 
+vmprint(pagetable_t root,int level){
+    if(level==2) printf("page table %p\n",(uint64)root);
+    for(int i=0; i<512; i++){
+       pte_t pte=root[i];
+       if(!pte || (pte & !PTE_V)) continue;
+       else if(pte & (PTE_R|PTE_W|PTE_X)){
+           for(int j=2;j>=level;j--){
+             printf(".. ");
+           }
+           printf("%d: pte %p pa %p\n",i,pte,PTE2PA(pte));
+       }
+       else if((pte &PTE_V) && !(pte &(PTE_R|PTE_W|PTE_X))){
+          for(int j=2;j>=level;j--){
+             printf(".. ");
+           }
+          printf("%d: pte %p pa %p\n",i,pte,PTE2PA(pte));
+          vmprint((pagetable_t)PTE2PA(root[i]),level-1);
+       }
+    }
+    return;
+}
+
+int pgaccess(pagetable_t pgtbl,uint64 va,int npages,uint64 buf){      
+      char bitmask[8];
+      for(int i=0;i<8;i++){
+        bitmask[i]=0;
+      }
+      pte_t *pte;
+      for(int i=0;i<npages;i++){
+         pte= (walk(pgtbl,va,0));
+         if(!pte || !(*pte & PTE_V)){
+            bitmask[i/8] |=(0<<(i%8));
+         }
+         else if((*pte &PTE_V) &&!(*pte & PTE_A)){
+            bitmask[i/8]|=(0<<(i%8));
+         }
+         else if((*pte &PTE_V) &&(*pte & PTE_A)){
+            *pte &= (~PTE_A);
+            bitmask[i/8]|=(1<<(i%8));
+            
+         }
+         va+=PGSIZE;
+      }
+      if(copyout(pgtbl,buf,bitmask,8)<0){
+        return -1;
+      }
+      return 0;
+}
